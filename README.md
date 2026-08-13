@@ -12,7 +12,9 @@ Double-click `index.html` and it opens in your browser. That's it.
 
 If you don't have the file yet, go to [the repo on GitHub](https://github.com/entirehq/wad-san-jose-booth-experience), click the green **Code** button → **Download ZIP**, unzip it, and double-click `index.html` inside.
 
-Move through the screens with the **Back** and **Next** buttons, or the ← and → arrow keys.
+Move through the screens with the **Start** and **Back**/**Next** buttons, or the ← and → arrow keys. Step 1 is a welcome screen, so it has no bar along the bottom — the progress bar appears from step 2 onwards, and there is no step counter anywhere.
+
+If nobody touches anything for ten seconds, the button they are meant to press next gives a small pulse, to draw a passing visitor's eye back to it.
 
 ## Change the text
 
