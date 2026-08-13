@@ -171,45 +171,109 @@
 
   .placeholder-text p:last-child { margin: 0; }
 
-  /* ---------- chat / first Trail ---------- */
+  /* ---------- gates ---------- */
 
-  .chat {
-    border: 1px solid var(--rule);
-    padding: 1.25rem;
+  .gates {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.6rem;
   }
 
-  .turn {
+  .gate {
     border: 1px solid var(--rule);
-    padding: 0.85rem 1rem;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-size: 0.95rem;
+    border-left-width: 6px;
+    padding: 0.8rem 1rem;
   }
 
-  .turn .step-no {
-    display: block;
-    font-family: inherit;
-    font-size: 0.75rem;
-    letter-spacing: 0.1em;
+  .gate-name { font-weight: 600; display: block; }
+
+  .gate-sub { font-size: 0.9rem; color: var(--muted); }
+
+  /* ---------- checklist / first Trail ---------- */
+
+  .checklist {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    counter-reset: task;
+  }
+
+  .task {
+    border: 1px solid var(--rule);
+    padding: 1rem 1.15rem;
+  }
+
+  .task-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    cursor: pointer;
+    counter-increment: task;
+  }
+
+  .task-line input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
+    margin: 0.15rem 0 0;
+    accent-color: #000;
+    flex: 0 0 auto;
+  }
+
+  .task-text { font-size: 1.1rem; }
+
+  .task-text::before {
+    content: "Step " counter(task) " — ";
     color: var(--muted);
-    margin-bottom: 0.35rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
 
-  .turn.you { margin-right: 2.5rem; }
-
-  .turn.agent {
-    margin-left: 2.5rem;
-    background: var(--wash);
+  .task-line input:checked ~ .task-text .task-body {
+    text-decoration: line-through;
     color: var(--muted);
   }
+
+  .hint { margin: 0.75rem 0 0 2.4rem; }
+
+  .hint summary {
+    display: inline-block;
+    border: 1px solid var(--rule);
+    padding: 0.4rem 0.9rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .hint summary::-webkit-details-marker { display: none; }
+
+  .hint summary:hover { background: #f2f2f2; }
+
+  .hint[open] summary { margin-bottom: 0.75rem; }
+
+  .hint summary .when-open,
+  .hint[open] summary .when-closed { display: none; }
+
+  .hint[open] summary .when-open { display: inline; }
+
+  .hint-body {
+    border-left: 2px solid var(--rule);
+    padding: 0.1rem 0 0.1rem 0.9rem;
+  }
+
+  .hint-body p { margin: 0 0 0.4rem; }
+
+  .hint-body p:last-child { margin: 0; }
 
   /* ---------- CTAs ---------- */
 
   .ctas {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.75rem;
     margin: 1.5rem 0 0;
   }
@@ -228,6 +292,69 @@
     display: block;
     margin-top: 0.15rem;
   }
+
+  /* ---------- finish + farewell ---------- */
+
+  .finish-btn {
+    display: block;
+    width: 100%;
+    margin: 2rem 0 0;
+    font-size: 1.35rem;
+    padding: 1.1rem;
+    min-height: 68px;
+    border-width: 2px;
+    letter-spacing: 0.02em;
+  }
+
+  .finish-btn:hover { background: var(--ink); color: var(--paper); }
+
+  #outro {
+    transition: opacity 300ms ease;
+  }
+
+  #outro.leaving { opacity: 0; }
+
+  .farewell { text-align: center; }
+
+  .farewell-line {
+    font-size: 3.2rem;
+    font-weight: 600;
+    line-height: 1.1;
+    margin: 0 0 1rem;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 550ms ease, transform 550ms ease;
+  }
+
+  .farewell-sub {
+    opacity: 0;
+    transition: opacity 450ms ease 350ms;
+  }
+
+  .farewell.in .farewell-line { opacity: 1; transform: scale(1); }
+
+  .farewell.in .farewell-sub { opacity: 1; }
+
+  /* three dashes that draw themselves under the farewell — a small "trail" */
+  .trail-marks {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .trail-marks span {
+    width: 2.5rem;
+    height: 2px;
+    background: var(--ink);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 300ms ease;
+  }
+
+  .farewell.in .trail-marks span:nth-child(1) { transform: scaleX(1); transition-delay: 600ms; }
+  .farewell.in .trail-marks span:nth-child(2) { transform: scaleX(1); transition-delay: 750ms; }
+  .farewell.in .trail-marks span:nth-child(3) { transform: scaleX(1); transition-delay: 900ms; }
 
   /* ---------- footer: nav + progress ---------- */
 
@@ -390,50 +517,97 @@
     <div class="video-placeholder">Video placeholder — Code Review Layer</div>
   </section>
 
-  <!-- 12 — build your first Trail -->
+  <!-- 12 — gates -->
   <section class="page" data-step="12">
-    <h1>Build your first Trail</h1>
-    <p class="meta">Three steps, using what you just learned.</p>
-    <div class="chat">
-      <div class="turn you">
-        <span class="step-no">STEP 1 — YOU</span>
-        Ask a question about a previous session.
-      </div>
-      <div class="turn agent">
-        <span class="step-no">RESPONSE</span>
-        Placeholder — what comes back.
-      </div>
-      <div class="turn you">
-        <span class="step-no">STEP 2 — YOU</span>
-        Resume that session.
-      </div>
-      <div class="turn agent">
-        <span class="step-no">RESPONSE</span>
-        Placeholder — what comes back.
-      </div>
-      <div class="turn you">
-        <span class="step-no">STEP 3 — YOU</span>
-        Open your first Trail.
-      </div>
-      <div class="turn agent">
-        <span class="step-no">RESPONSE</span>
-        Placeholder — confirmation that the Trail exists.
-      </div>
+    <h1>Gates on Trails</h1>
+    <div class="placeholder-text">
+      <p class="eyebrow">Placeholder — copy goes here</p>
+      <p>A deeper look at gates: what a Trail checks before code is allowed through, and why that
+        is what code review looks like in the era of agents.</p>
+    </div>
+    <div class="gates">
+      <div class="gate"><span class="gate-name">Gate — placeholder</span><span class="gate-sub">What it checks</span></div>
+      <div class="gate"><span class="gate-name">Gate — placeholder</span><span class="gate-sub">What it checks</span></div>
+      <div class="gate"><span class="gate-name">Gate — placeholder</span><span class="gate-sub">What it checks</span></div>
     </div>
   </section>
 
-  <!-- 13 — thanks + CTAs -->
+  <!-- 13 — build your first Trail -->
   <section class="page" data-step="13">
-    <h1 data-slot="thanks">Thanks for stopping by</h1>
-    <p class="meta">Before you go — a few ways to keep in touch.</p>
-    <div class="ctas">
-      <div class="cta"><span class="cta-title">Subscribe to our newsletter</span><span class="cta-sub">Placeholder — QR code</span></div>
-      <div class="cta"><span class="cta-title">Follow us on social</span><span class="cta-sub">Placeholder — handles</span></div>
-      <div class="cta"><span class="cta-title">Use MTR</span><span class="cta-sub">Placeholder — one line + link</span></div>
-      <div class="cta"><span class="cta-title">Join our Discord</span><span class="cta-sub">Placeholder — invite QR</span></div>
-      <div class="cta"><span class="cta-title">Take a selfie</span><span class="cta-sub">Grab the frame at the booth</span></div>
-      <div class="cta"><span class="cta-title">Speak to us</span><span class="cta-sub">Anyone here is happy to talk</span></div>
-      <div class="cta"><span class="cta-title">Come back any time</span><span class="cta-sub">Run it again, or bring a colleague — more swag</span></div>
+    <h1>Build your first Trail</h1>
+    <p class="meta">Three steps, using what you just learned. Tick them off as you go.</p>
+
+    <ol class="checklist">
+      <li class="task">
+        <label class="task-line">
+          <input type="checkbox">
+          <span class="task-text"><span class="task-body">Ask a question about a previous session.</span></span>
+        </label>
+        <details class="hint">
+          <summary><span class="when-closed">Get a hint</span><span class="when-open">Hide hint</span></summary>
+          <div class="hint-body">
+            <p>Placeholder — the hint for this step.</p>
+            <p class="meta">Need more help? Ask at the Entire booth.</p>
+          </div>
+        </details>
+      </li>
+
+      <li class="task">
+        <label class="task-line">
+          <input type="checkbox">
+          <span class="task-text"><span class="task-body">Resume that session.</span></span>
+        </label>
+        <details class="hint">
+          <summary><span class="when-closed">Get a hint</span><span class="when-open">Hide hint</span></summary>
+          <div class="hint-body">
+            <p>Placeholder — the hint for this step.</p>
+            <p class="meta">Need more help? Ask at the Entire booth.</p>
+          </div>
+        </details>
+      </li>
+
+      <li class="task">
+        <label class="task-line">
+          <input type="checkbox">
+          <span class="task-text"><span class="task-body">Open your first Trail.</span></span>
+        </label>
+        <details class="hint">
+          <summary><span class="when-closed">Get a hint</span><span class="when-open">Hide hint</span></summary>
+          <div class="hint-body">
+            <p>Placeholder — the hint for this step.</p>
+            <p class="meta">Need more help? Ask at the Entire booth.</p>
+          </div>
+        </details>
+      </li>
+    </ol>
+  </section>
+
+  <!-- 14 — thanks + CTAs + finish -->
+  <section class="page" data-step="14">
+    <div id="outro">
+      <h1 data-slot="thanks">Thanks for stopping by</h1>
+      <p class="meta">Three quick things before you go.</p>
+      <div class="ctas">
+        <div class="cta">
+          <span class="cta-title">Take a selfie — and tag us</span>
+          <span class="cta-sub">Placeholder — frame at the booth + handle to tag</span>
+        </div>
+        <div class="cta">
+          <span class="cta-title">Subscribe to our newsletter</span>
+          <span class="cta-sub">Placeholder — QR code</span>
+        </div>
+        <div class="cta">
+          <span class="cta-title">Join our Discord</span>
+          <span class="cta-sub">Placeholder — invite QR</span>
+        </div>
+      </div>
+      <button type="button" id="finish" class="finish-btn">Finish</button>
+    </div>
+
+    <div id="farewell" class="farewell" hidden>
+      <p class="farewell-line" data-slot="farewell">Happy trails</p>
+      <p class="meta farewell-sub">Come back any time — bring a colleague.</p>
+      <div class="trail-marks"><span></span><span></span><span></span></div>
     </div>
   </section>
 
@@ -453,7 +627,7 @@
 
 <script>
 (function () {
-  var TOTAL = 13;
+  var TOTAL = 14;
 
   // Which layer the overview zooms into, per overview step.
   var ZOOM_TARGET = { 3: '1', 7: '2', 10: '3' };
@@ -467,6 +641,9 @@
   var fill = document.getElementById('fill');
   var stepLabel = document.getElementById('step-label');
   var nameInput = document.getElementById('name');
+  var finishBtn = document.getElementById('finish');
+  var outro = document.getElementById('outro');
+  var farewell = document.getElementById('farewell');
 
   function stepsOf(page) {
     return page.getAttribute('data-step').split(' ');
@@ -493,10 +670,22 @@
 
     document.querySelector('[data-slot="thanks"]').textContent =
       name ? 'Thanks, ' + name : 'Thanks for stopping by';
+
+    document.querySelector('[data-slot="farewell"]').textContent =
+      name ? 'Happy trails, ' + name : 'Happy trails';
+  }
+
+  // Put the outro back so the next visitor starts from the CTAs, not the farewell.
+  function resetOutro() {
+    outro.hidden = false;
+    outro.classList.remove('leaving');
+    farewell.hidden = true;
+    farewell.classList.remove('in');
   }
 
   function render() {
     clearZoom();
+    resetOutro();
 
     for (var i = 0; i < pages.length; i++) {
       pages[i].classList.toggle('active', stepsOf(pages[i]).indexOf(String(step)) !== -1);
@@ -552,6 +741,16 @@
     if (animating) return;
     goTo(step - 1);
   }
+
+  finishBtn.addEventListener('click', function () {
+    outro.classList.add('leaving');
+    setTimeout(function () {
+      outro.hidden = true;
+      farewell.hidden = false;
+      // let the browser paint the hidden->shown swap before transitioning in
+      requestAnimationFrame(function () { farewell.classList.add('in'); });
+    }, 300);
+  });
 
   document.addEventListener('click', function (e) {
     var el = e.target.closest('[data-nav]');
