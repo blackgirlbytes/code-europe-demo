@@ -2,7 +2,9 @@
 
 Self-paced learning experience for the Entire booth at WeAreDevelopers San Jose. Participants walk through Entire's three layers and create their first Trail.
 
-Everything lives in one file: `index.html`. No installation, no build step, no internet needed.
+Everything lives in one file: `index.html`. No installation, no build step, no internet needed — the Entire typefaces, the Marvin artwork and the logo are all embedded inside it, so it looks right even with the conference wifi down.
+
+`assets/` holds the original brand files those embedded copies came from. Nothing loads them at runtime; they are there so a developer can re-embed them if they ever change.
 
 ## Open it
 
@@ -59,6 +61,16 @@ Text still waiting to be written is marked **Placeholder** — search for that w
 ### What not to edit
 
 Near the top of the file is a `<style>` section, and near the bottom a `<script>` section. Those control the look and the Back/Next behaviour — leave both alone unless you write code.
+
+The very top of the file also has two enormous unreadable lines of letters and numbers. That is the embedded Entire Headline and Entire Mono type. Scroll straight past it — searching for your text still works normally.
+
+## Marvin
+
+Marvin appears on the screens with the dusk background: he patrols the page on step 1, walks up to the visitor on step 2, drops back in on step 14, and hops above "Happy trails!" after Finish. Steps 3 to 13 are the near-black website look, with no Marvin, so nothing competes with the teaching.
+
+His movement is deliberately stepped rather than smooth, so it reads as servo movement rather than floating. Anyone who has motion sensitivity turned on in their operating system sees him standing still instead.
+
+The artwork is the same 108x56 Marvin from entire.io, which is the largest version published. He is shown at 132px and should not be scaled much past that or he will go soft. A higher-resolution Marvin would be worth having if he is going on a big screen.
 
 ## Videos
 
