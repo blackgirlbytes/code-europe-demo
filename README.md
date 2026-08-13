@@ -14,7 +14,7 @@ If you don't have the file yet, go to [the repo on GitHub](https://github.com/en
 
 Move through the screens with the **Start** and **Back**/**Next** buttons, or the ← and → arrow keys. Step 1 is a welcome screen, so it has no bar along the bottom — the progress bar appears from step 2 onwards, and there is no step counter anywhere.
 
-If nobody touches anything for ten seconds, the button they are meant to press next gives a small pulse, to draw a passing visitor's eye back to it.
+The **Start** button flares continuously — a warm halo breathing under it and a light sweep crossing it — so a passer-by always has something catching their eye. On the later screens, where a continuous flare would be a distraction while reading, the **Next** or **Finish** button instead gives one small pulse after every ten seconds of nobody touching anything.
 
 ## Change the text
 
@@ -68,13 +68,13 @@ The very top of the file also has two enormous unreadable lines of letters and n
 
 ## Marvin
 
-Marvin appears on the screens with the dusk background: he is already drifting around on step 1, walks in from the left to meet the visitor on step 2, comes back down from above on step 14, and sways beside "Happy trails!" after Finish. Steps 3 to 13 are the near-black website look, with no Marvin, so nothing competes with the teaching.
+Marvin appears on the screens with the dusk background: driving back and forth across the bottom on step 1, coming in from the left to meet the visitor on step 2, in from the right on step 14, and drifting beside "Happy trails!" after Finish. Steps 3 to 13 are the near-black website look, with no Marvin, so nothing competes with the teaching.
 
-He moves slowly — a single move takes twelve to sixteen seconds, and he waits fifteen to twenty seconds before choosing somewhere new. The movement is stepped rather than smooth so it reads as servo movement rather than floating. Anyone who has motion sensitivity turned on in their operating system sees him standing still instead.
+He only ever moves horizontally, and only ever along one line near the bottom of the screen — he never rises into the text or floats down from the top. Each move is a single constant-speed travel with no easing and no tilting, which is what makes it read as a machine driving across rather than something floating. A crossing takes about 46 seconds on step 1; his entrances take 11.
 
-Where he is allowed to go is worked out in JavaScript from the size of the window and the width of the text column, so he keeps to the empty margins beside the words and the band above the footer, and never drifts up into the top of the screen. On a narrow window he stays low and central. That is why his movement is not written as fixed CSS keyframes.
+Where that bottom line sits, and how far he may travel, are worked out in JavaScript from the window size, the footer height and the width of the text column, so he stays clear of the words at any window size. That is why his movement is not written as fixed CSS keyframes. Anyone who has motion sensitivity turned on in their operating system sees him parked and still instead.
 
-The artwork is the whole robot — head, antenna, neck and body — cut out of Entire's social card, which is the only place the full Marvin is published. He is shown at his natural 340px. His body is cropped at the bottom in the original, so he is always parked low enough that the cut sits off the bottom of the screen. A proper Marvin render would be worth having if he is going on a big screen.
+The artwork is the whole robot — head, antenna, neck and body — cut out of Entire's social card, which is the only place the full Marvin is published, by `assets/marvin-cutout.py`. He is shown at his natural 340px. His body is cropped at the bottom in the original, which is another reason he rides the bottom line: the cut sits off the edge of the screen. A proper Marvin render would be worth having if he is going on a big screen.
 
 ## Videos
 

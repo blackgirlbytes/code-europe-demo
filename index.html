@@ -186,7 +186,7 @@ body.marvin-on #marvin-layer { opacity: 1; }
 /* #marvin-path is moved by JavaScript. Nothing else may touch its transform. */
 #marvin-path { will-change: transform; }
 
-#marvin-bob { animation: servo-bob 5.5s steps(6, end) infinite alternate; }
+#marvin-bob { animation: servo-bob 7s steps(4, end) infinite alternate; }
 
 #marvin-img {
   width: 340px;          /* the cutout's natural width — keeps him crisp */
@@ -196,8 +196,8 @@ body.marvin-on #marvin-layer { opacity: 1; }
 }
 
 @keyframes servo-bob {
-  from { transform: translateY(-7px) rotate(-0.6deg); }
-  to   { transform: translateY(7px) rotate(0.6deg); }
+  from { transform: translateX(-6px); }
+  to   { transform: translateX(6px); }
 }
 
 @keyframes led-pulse {
@@ -306,6 +306,8 @@ input[type="text"]:focus {
 }
 
 .start-btn {
+  position: relative;
+  overflow: hidden;
   display: inline-block;
   margin: 2.2rem auto 0;
   font-family: var(--font-headline);
@@ -321,6 +323,35 @@ input[type="text"]:focus {
 }
 
 .start-btn:hover { background: #eaeaea; }
+
+/* Continuous flare: a warm halo breathing under the button and a light sweep
+   crossing it, offset so there is never a moment where nothing is moving. */
+.start-btn {
+  animation: start-halo 3.4s ease-in-out infinite;
+}
+
+.start-btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 55%;
+  background: linear-gradient(100deg, transparent 0%, rgba(17, 17, 17, 0.07) 50%, transparent 100%);
+  transform: translateX(-160%);
+  animation: start-sweep 3.4s linear infinite;
+}
+
+@keyframes start-halo {
+  0%, 100% { box-shadow: 0 0 14px 0 rgba(242, 85, 51, 0.28); }
+  50%      { box-shadow: 0 0 30px 5px rgba(242, 85, 51, 0.5); }
+}
+
+@keyframes start-sweep {
+  0%   { transform: translateX(-160%); }
+  70%  { transform: translateX(320%); }
+  100% { transform: translateX(320%); }
+}
 
 /* A small nudge on the button the visitor is meant to press next, replayed
    by JavaScript after every 10 seconds of no interaction. */
@@ -685,7 +716,7 @@ button[hidden] { display: none; }
 @media (prefers-reduced-motion: reduce) {
   #marvin-path, #marvin-bob, #marvin-img { animation: none !important; }
   #marvin-path { transition: none !important; }
-  .nudge { animation: none !important; }
+  .nudge, .start-btn, .start-btn::after { animation: none !important; }
   .tier, .fill, #outro, .farewell-line, .farewell-sub, #bg > div { transition: none !important; }
 }
 </style>
@@ -996,21 +1027,19 @@ button[hidden] { display: none; }
 
   /* ================================================================
      Marvin
-     He is big, so where he can go depends on the viewport: the empty
-     margins beside the content column, and the band below it. Rather
-     than hard-code that in CSS keyframes, pick spots from the space
-     actually available and glide him there slowly. Stepped easing keeps
-     the movement mechanical rather than floaty.
+     He travels horizontally along the bottom of the screen and nowhere
+     else: one long, constant-speed move at a time, no easing, so it
+     reads as a machine driving across rather than something floating.
+     The bottom line and the travel limits come from the viewport, so he
+     stays clear of the text column and the footer at any window size.
      ================================================================ */
 
   var marvin = {
-    layer: document.getElementById('marvin-layer'),
     path: document.getElementById('marvin-path'),
     img: document.getElementById('marvin-img'),
     timer: null,
-    arrive: null,
     mode: null,
-    park: null      // where this mode leaves him, recomputed on resize
+    park: null
   };
 
   function marvinSize() {
@@ -1018,81 +1047,58 @@ button[hidden] { display: none; }
     return { w: r.width || 340, h: r.height || 261 };
   }
 
-  // Half-width of the content column, so Marvin can stay out of the text.
-  function columnHalf() {
-    var page = document.querySelector('.page.active');
-    var r = page ? page.getBoundingClientRect() : null;
-    return r && r.width ? r.width / 2 : 368;
-  }
-
-  // Offsets are from the centre of the viewport, which is where the flex
-  // container parks him. Positive y is downwards — he never goes above centre.
-  function safeSpot() {
-    var vw = window.innerWidth, vh = window.innerHeight;
+  // The one height he ever sits at: as low as he goes without meeting the footer.
+  function bottomY() {
     var m = marvinSize();
-    var sideRoom = vw / 2 - columnHalf() - 24;      // gap beside the column
-    var footerRoom = footer.offsetHeight + 20;
-
-    var yMin = Math.round(vh * 0.04);
-    var yMax = Math.max(yMin, Math.round(vh / 2 - m.h / 2 - footerRoom));
-
-    var xMax = Math.max(0, Math.round(vw / 2 - m.w / 2 + 40));  // a little bleed is fine
-    var xSide = Math.round(Math.max(sideRoom, 0) + m.w * 0.18);
-
-    var x;
-    if (xSide < xMax && sideRoom > 60) {
-      // room beside the column: sit in the left or right margin
-      x = (Math.random() < 0.5 ? -1 : 1) * (xSide + Math.random() * Math.max(0, xMax - xSide));
-    } else {
-      // narrow window: stay low and roughly centred, behind nothing important
-      x = (Math.random() - 0.5) * xMax * 0.8;
-      yMin = yMax;
-    }
-
-    return {
-      x: Math.round(x),
-      y: Math.round(yMin + Math.random() * (yMax - yMin)),
-      rot: Math.round((Math.random() * 6 - 3) * 10) / 10
-    };
+    var footerRoom = (footer.hidden ? 24 : footer.offsetHeight + 16);
+    return Math.round(window.innerHeight / 2 - m.h / 2 - footerRoom);
   }
 
-  function marvinGo(spot, seconds, jumps) {
-    marvin.path.style.transition = reduceMotion ? 'none'
-      : 'transform ' + seconds + 's steps(' + jumps + ', end)';
-    marvin.path.style.transform =
-      'translate(' + spot.x + 'px, ' + spot.y + 'px) rotate(' + spot.rot + 'deg)';
+  // Just past the left/right edge, where he enters from and exits to.
+  function offscreenX() {
+    return Math.round(window.innerWidth / 2 + marvinSize().w / 2 + 20);
   }
 
-  function marvinPlace(spot) {
+  // One movement: constant speed, no easing, no rotation — he stays level.
+  function marvinGo(x, seconds) {
+    marvin.path.style.transition = reduceMotion ? 'none' : 'transform ' + seconds + 's linear';
+    marvin.path.style.transform = 'translate(' + Math.round(x) + 'px, ' + bottomY() + 'px)';
+  }
+
+  function marvinPlace(x) {
     marvin.path.style.transition = 'none';
-    marvin.path.style.transform =
-      'translate(' + spot.x + 'px, ' + spot.y + 'px) rotate(' + spot.rot + 'deg)';
-    // force the jump to land before any later transition is applied
-    void marvin.path.offsetWidth;
+    marvin.path.style.transform = 'translate(' + Math.round(x) + 'px, ' + bottomY() + 'px)';
+    void marvin.path.offsetWidth;   // commit the jump before any transition
   }
 
   function marvinStop() {
-    if (marvin.timer) { clearInterval(marvin.timer); marvin.timer = null; }
-    if (marvin.arrive) { clearTimeout(marvin.arrive); marvin.arrive = null; }
+    if (marvin.timer) { clearTimeout(marvin.timer); marvin.timer = null; }
   }
 
-  // Once a scripted entrance has landed, let him drift again from wherever he is.
-  function roamAfter(delayMs, everyMs, seconds, jumps) {
-    marvin.arrive = setTimeout(function () {
-      marvin.park = safeSpot;
-      marvinRoam(everyMs, seconds, jumps);
-    }, delayMs);
-  }
-
-  function marvinRoam(everyMs, seconds, jumps) {
+  // Drive slowly from a to b, then back, for as long as this mode lasts.
+  function patrol(a, b, seconds) {
     marvinStop();
-    if (reduceMotion) return;
-    marvin.timer = setInterval(function () {
-      marvinGo(safeSpot(), seconds, jumps);
-    }, everyMs);
+    if (reduceMotion) { marvinPlace(a); return; }
+    var toB = true;
+    marvinGo(b, seconds);
+    (function leg() {
+      marvin.timer = setTimeout(function () {
+        toB = !toB;
+        marvinGo(toB ? b : a, seconds);
+        leg();
+      }, seconds * 1000);
+    })();
   }
 
-  // Each mode: where he comes from, where he goes, and how he idles after.
+  // Come in from one edge, then keep patrolling gently around where he stopped.
+  function arriveThenPatrol(fromX, targetX, seconds, spread, patrolSeconds) {
+    marvinPlace(fromX);
+    marvinGo(targetX, seconds);
+    marvin.timer = setTimeout(function () {
+      patrol(targetX - spread, targetX + spread, patrolSeconds);
+    }, seconds * 1000);
+  }
+
   function marvinMode(mode) {
     if (marvin.mode === mode) return;
     marvin.mode = mode;
@@ -1103,70 +1109,54 @@ button[hidden] { display: none; }
       return;
     }
 
-    var vw = window.innerWidth, vh = window.innerHeight;
+    var edge = offscreenX();
     var m = marvinSize();
-    var first = safeSpot();
+    // how far along the bottom he may travel before he'd leave the screen
+    var reach = Math.round(window.innerWidth / 2 - m.w / 2 + m.w * 0.22);
 
-    if (mode === 'float') {
-      // STEP 1 — already in the room, drifting slowly through the empty margins.
-      marvin.park = safeSpot;
-      marvinPlace(first);
-      marvinGo(safeSpot(), 14, 18);
-      marvinRoam(15000, 14, 18);
+    if (mode === 'intro') {
+      // STEP 1 — driving back and forth across the bottom, very slowly.
+      marvinPlace(-edge);
+      patrol(-reach, reach, 46);
+      marvin.park = function () { return null; };
 
     } else if (mode === 'enter') {
-      // STEP 2 — walks in from the left edge and stops in front of the visitor.
-      marvin.park = function () {
-        return { x: 0, y: Math.round(window.innerHeight * 0.22), rot: 0 };
-      };
-      marvinPlace({ x: -Math.round(vw / 2 + m.w), y: Math.round(vh * 0.2), rot: -3 });
-      marvinGo(marvin.park(), 7, 22);
-      roamAfter(8000, 22000, 16, 20);
+      // STEP 2 — in from the left immediately, up to the middle, then a slow idle.
+      arriveThenPatrol(-edge, 0, 11, 90, 30);
+      marvin.park = function () { return 0; };
 
-    } else if (mode === 'return') {
-      // STEP 14 — comes back down from above and parks off to one side.
-      marvin.park = function () {
-        var mm = marvinSize();
-        return {
-          x: Math.round(Math.max(window.innerWidth / 2 - columnHalf() - 24, 0) + mm.w * 0.32),
-          y: Math.round(window.innerHeight * 0.23),
-          rot: 0
-        };
-      };
-      marvinPlace({ x: marvin.park().x, y: -Math.round(vh / 2 + m.h), rot: -6 });
-      marvinGo(marvin.park(), 6, 20);
-      roamAfter(7000, 20000, 15, 18);
+    } else if (mode === 'thanks') {
+      // STEP 14 — in from the right this time, parking clear of the buttons.
+      var side = Math.round(Math.max(window.innerWidth / 2 - columnHalf() - 24, 0) + m.w * 0.3);
+      arriveThenPatrol(edge, side, 11, 70, 28);
+      marvin.park = function () { return side; };
 
     } else if (mode === 'cheer') {
-      // After Finish — a slow, pleased sway below the farewell line.
-      var base = Math.round(Math.max(vw / 2 - columnHalf() - 24, 0) + m.w * 0.28);
-      var flip = false;
-      marvin.park = function () {
-        return { x: base, y: Math.round(window.innerHeight * 0.2), rot: 2 };
-      };
-      marvinGo({ x: base, y: Math.round(vh * 0.2), rot: 2 }, 4, 10);
-      if (!reduceMotion) {
-        marvin.timer = setInterval(function () {
-          flip = !flip;
-          marvinGo({
-            x: flip ? base - 40 : base + 40,
-            y: Math.round(vh * (flip ? 0.16 : 0.23)),
-            rot: flip ? -3 : 3
-          }, 4, 10);
-        }, 4200);
-      }
+      // After Finish — stays on the bottom line, drifting slowly to and fro.
+      var base = Math.round(Math.max(window.innerWidth / 2 - columnHalf() - 24, 0) + m.w * 0.28);
+      patrol(base - 90, base + 90, 26);
+      marvin.park = function () { return base; };
     }
 
     document.body.classList.add('marvin-on');
   }
 
+  // Half-width of the content column, so Marvin can park clear of the text.
+  function columnHalf() {
+    var page = document.querySelector('.page.active');
+    var r = page ? page.getBoundingClientRect() : null;
+    return r && r.width ? r.width / 2 : 368;
+  }
+
   var resizeTimer = null;
   window.addEventListener('resize', function () {
-    if (!marvin.mode || !marvin.park) return;
+    if (!marvin.mode) return;
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(function () {
-      marvinGo(marvin.park(), 2, 6);
-    }, 250);
+      var mode = marvin.mode;
+      marvin.mode = null;      // re-run the mode against the new viewport
+      marvinMode(mode);
+    }, 300);
   });
 
   /* ================================================================
@@ -1179,7 +1169,8 @@ button[hidden] { display: none; }
   var lastActivity = Date.now();
 
   function primaryButton() {
-    if (step === 1) return startBtn;
+    // Step 1's Start button flares continuously, so it needs no nudging.
+    if (step === 1) return null;
     var page = document.querySelector('.page.active');
     if (page && finishBtn && !finishBtn.closest('[hidden]') && page.contains(finishBtn)) {
       return finishBtn;
@@ -1255,7 +1246,7 @@ button[hidden] { display: none; }
     document.body.classList.toggle('theme-hero', !!HERO_STEPS[step]);
     document.body.classList.toggle('theme-grid', !HERO_STEPS[step]);
 
-    marvinMode(step === 1 ? 'float' : step === 2 ? 'enter' : step === 14 ? 'return' : null);
+    marvinMode(step === 1 ? 'intro' : step === 2 ? 'enter' : step === 14 ? 'thanks' : null);
 
     fillSlots();
     document.querySelector('main').scrollTop = 0;
