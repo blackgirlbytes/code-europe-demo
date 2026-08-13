@@ -33,17 +33,19 @@ So `<h1>Gates on Trails</h1>` can safely become `<h1>How gates work</h1>`. If yo
 
 ### Finding the right screen
 
-Each screen is marked with a numbered comment, so searching for the number gets you there:
+The screens sit in the file in the same order the visitor sees them, 1 to 14, each under a banner. Search for the step number to jump straight to it:
 
 ```
-<!-- 12 — gates -->
+<!-- ==================================================================
+     STEP 12 of 14 — Gates on Trails
+     ================================================================== -->
 ```
 
 | Screen | What's on it |
 |---|---|
 | 1 | Name entry, headline, estimated time |
 | 2 | Welcome + what Entire is |
-| 3 · 7 · 10 | The three layers — one screen shown three times, so editing it changes all three |
+| 3 · 7 · 10 | The three layers, shown three times. Edit the wording under **STEP 3** — steps 7 and 10 copy it automatically |
 | 4 | Semantic Layer |
 | 5 · 6 | Checkpoints · Using the CLI |
 | 8 · 9 | Distribution Layer · Speed comparison |

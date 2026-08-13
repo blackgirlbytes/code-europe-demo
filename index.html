@@ -403,7 +403,9 @@
 
 <main>
 
-  <!-- 1 — intro -->
+  <!-- ==================================================================
+       STEP 1 of 14 — Welcome and name entry
+       ================================================================== -->
   <section class="page intro" data-step="1">
     <span class="topline">You drive yourself · Est. 4 minutes</span>
     <h1>Build your first Trail<br>and win Entire swag</h1>
@@ -411,7 +413,9 @@
     <input type="text" id="name" autocomplete="given-name" placeholder="Type your name">
   </section>
 
-  <!-- 2 — welcome + what Entire is -->
+  <!-- ==================================================================
+       STEP 2 of 14 — Welcome by name, and what Entire is
+       ================================================================== -->
   <section class="page" data-step="2">
     <h1 data-slot="greeting">Welcome to Entire, <span class="meta">[name]</span></h1>
     <div class="placeholder-text">
@@ -421,8 +425,10 @@
     </div>
   </section>
 
-  <!-- 3 / 7 / 10 — the three layers (same page each time) -->
-  <section class="page" data-step="3 7 10" data-overview>
+  <!-- ==================================================================
+       STEP 3 of 14 — The three layers (zooms into the Semantic Layer)
+       ================================================================== -->
+  <section class="page" data-step="3" data-overview data-overview-source>
     <p class="eyebrow">The approach</p>
     <h1>Three layers</h1>
     <p>Entire works across three layers. We'll walk through them one at a time.</p>
@@ -442,7 +448,9 @@
     </div>
   </section>
 
-  <!-- 4 — Semantic Layer -->
+  <!-- ==================================================================
+       STEP 4 of 14 — Semantic Layer
+       ================================================================== -->
   <section class="page" data-step="4">
     <div class="layer-title">
       <p class="eyebrow">Layer 1 of 3</p>
@@ -455,19 +463,32 @@
     </div>
   </section>
 
-  <!-- 5 — Checkpoints -->
+  <!-- ==================================================================
+       STEP 5 of 14 — Semantic Layer: Checkpoints
+       ================================================================== -->
   <section class="page" data-step="5">
     <h1>Checkpoints</h1>
     <div class="video-placeholder">Video placeholder — Checkpoints</div>
   </section>
 
-  <!-- 6 — CLI -->
+  <!-- ==================================================================
+       STEP 6 of 14 — Semantic Layer: using the CLI
+       ================================================================== -->
   <section class="page" data-step="6">
     <h1>You, or your agent, using the CLI</h1>
     <div class="video-placeholder">Video placeholder — You or your agent using the CLI</div>
   </section>
 
-  <!-- 8 — Distribution Layer -->
+  <!-- ==================================================================
+       STEP 7 of 14 — The three layers (zooms into the Distribution Layer)
+       ================================================================== -->
+  <!-- Filled from STEP 3 when the page loads, so the three layers only
+       ever need editing in one place. Edit STEP 3 to change all three. -->
+  <section class="page" data-step="7" data-overview data-overview-clone></section>
+
+  <!-- ==================================================================
+       STEP 8 of 14 — Distribution Layer
+       ================================================================== -->
   <section class="page" data-step="8">
     <div class="layer-title">
       <p class="eyebrow">Layer 2 of 3</p>
@@ -479,13 +500,24 @@
     <div class="video-placeholder">Video placeholder — Mirroring &amp; jurisdiction</div>
   </section>
 
-  <!-- 9 — Speed comparison -->
+  <!-- ==================================================================
+       STEP 9 of 14 — Distribution Layer: speed comparison
+       ================================================================== -->
   <section class="page" data-step="9">
     <h1>Speed comparison</h1>
     <div class="video-placeholder">Video placeholder — Speed comparison</div>
   </section>
 
-  <!-- 11 — Code Review Layer -->
+  <!-- ==================================================================
+       STEP 10 of 14 — The three layers (zooms into the Code Review Layer)
+       ================================================================== -->
+  <!-- Filled from STEP 3 when the page loads, so the three layers only
+       ever need editing in one place. Edit STEP 3 to change all three. -->
+  <section class="page" data-step="10" data-overview data-overview-clone></section>
+
+  <!-- ==================================================================
+       STEP 11 of 14 — Code Review Layer
+       ================================================================== -->
   <section class="page" data-step="11">
     <div class="layer-title">
       <p class="eyebrow">Layer 3 of 3</p>
@@ -498,7 +530,9 @@
     <div class="video-placeholder">Video placeholder — Code Review Layer</div>
   </section>
 
-  <!-- 12 — gates -->
+  <!-- ==================================================================
+       STEP 12 of 14 — Gates on Trails
+       ================================================================== -->
   <section class="page" data-step="12">
     <h1>Gates on Trails</h1>
     <div class="placeholder-text">
@@ -514,7 +548,9 @@
     <div class="video-placeholder">Video placeholder — Gates on Trails</div>
   </section>
 
-  <!-- 13 — build your first Trail -->
+  <!-- ==================================================================
+       STEP 13 of 14 — Build your first Trail: the checklist
+       ================================================================== -->
   <section class="page" data-step="13">
     <h1>Build your first Trail</h1>
     <p class="meta">Three steps, using what you just learned. Tick them off as you go.</p>
@@ -564,7 +600,9 @@
     </ol>
   </section>
 
-  <!-- 14 — thanks + CTAs + finish -->
+  <!-- ==================================================================
+       STEP 14 of 14 — Thanks, CTAs and Finish
+       ================================================================== -->
   <section class="page" data-step="14">
     <div id="outro">
       <h1 data-slot="thanks">Thanks for stopping by</h1>
@@ -626,13 +664,17 @@
   var outro = document.getElementById('outro');
   var farewell = document.getElementById('farewell');
 
-  function stepsOf(page) {
-    return page.getAttribute('data-step').split(' ');
-  }
-
   function activePage() {
     return document.querySelector('.page.active');
   }
+
+  // STEPS 7 and 10 show the same three layers as STEP 3 — copy it in rather than
+  // repeating the markup, so the wording can never drift between them.
+  (function cloneOverviews() {
+    var source = document.querySelector('[data-overview-source]');
+    var clones = document.querySelectorAll('[data-overview-clone]');
+    for (var i = 0; i < clones.length; i++) clones[i].innerHTML = source.innerHTML;
+  })();
 
   function clearZoom() {
     var tiers = document.querySelectorAll('.tiers');
@@ -666,7 +708,7 @@
     resetOutro();
 
     for (var i = 0; i < pages.length; i++) {
-      pages[i].classList.toggle('active', stepsOf(pages[i]).indexOf(String(step)) !== -1);
+      pages[i].classList.toggle('active', Number(pages[i].getAttribute('data-step')) === step);
     }
 
     backBtn.hidden = (step === 1);
