@@ -4,7 +4,7 @@ Self-paced learning experience for the Entire booth at WeAreDevelopers San Jose.
 
 Everything lives in one file: `index.html`. No installation, no build step, no internet needed — the Entire typefaces, the Marvin artwork and the logo are all embedded inside it, so it looks right even with the conference wifi down.
 
-`assets/` holds the original brand files those embedded copies came from. Nothing loads them at runtime; they are there so a developer can re-embed them if they ever change.
+`assets/` holds the original brand files those embedded copies came from, plus `marvin-cutout.py`, the script that lifted Marvin off Entire's social card. Nothing loads them at runtime; they are there so a developer can redo the work if the artwork changes.
 
 ## Open it
 
@@ -45,7 +45,7 @@ The screens sit in the file in the same order the visitor sees them, 1 to 14, ea
 
 | Screen | What's on it |
 |---|---|
-| 1 | Name entry, headline, estimated time |
+| 1 | Name entry, headline, estimated time, and the Start button |
 | 2 | Welcome + what Entire is |
 | 3 · 7 · 10 | The three layers, shown three times. Edit the wording under **STEP 3** — steps 7 and 10 copy it automatically |
 | 4 | Semantic Layer |
@@ -66,11 +66,13 @@ The very top of the file also has two enormous unreadable lines of letters and n
 
 ## Marvin
 
-Marvin appears on the screens with the dusk background: he patrols the page on step 1, walks up to the visitor on step 2, drops back in on step 14, and hops above "Happy trails!" after Finish. Steps 3 to 13 are the near-black website look, with no Marvin, so nothing competes with the teaching.
+Marvin appears on the screens with the dusk background: he is already drifting around on step 1, walks in from the left to meet the visitor on step 2, comes back down from above on step 14, and sways beside "Happy trails!" after Finish. Steps 3 to 13 are the near-black website look, with no Marvin, so nothing competes with the teaching.
 
-His movement is deliberately stepped rather than smooth, so it reads as servo movement rather than floating. Anyone who has motion sensitivity turned on in their operating system sees him standing still instead.
+He moves slowly — a single move takes twelve to sixteen seconds, and he waits fifteen to twenty seconds before choosing somewhere new. The movement is stepped rather than smooth so it reads as servo movement rather than floating. Anyone who has motion sensitivity turned on in their operating system sees him standing still instead.
 
-The artwork is the same 108x56 Marvin from entire.io, which is the largest version published. He is shown at 132px and should not be scaled much past that or he will go soft. A higher-resolution Marvin would be worth having if he is going on a big screen.
+Where he is allowed to go is worked out in JavaScript from the size of the window and the width of the text column, so he keeps to the empty margins beside the words and the band above the footer, and never drifts up into the top of the screen. On a narrow window he stays low and central. That is why his movement is not written as fixed CSS keyframes.
+
+The artwork is the whole robot — head, antenna, neck and body — cut out of Entire's social card, which is the only place the full Marvin is published. He is shown at his natural 340px. His body is cropped at the bottom in the original, so he is always parked low enough that the cut sits off the bottom of the screen. A proper Marvin render would be worth having if he is going on a big screen.
 
 ## Videos
 
