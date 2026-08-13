@@ -175,19 +175,19 @@
 
   .gates {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     gap: 0.6rem;
+    margin: 0 0 1.5rem;
   }
 
   .gate {
     border: 1px solid var(--rule);
-    border-left-width: 6px;
-    padding: 0.8rem 1rem;
+    border-radius: 999px;
+    padding: 0.45rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    white-space: nowrap;
   }
-
-  .gate-name { font-weight: 600; display: block; }
-
-  .gate-sub { font-size: 0.9rem; color: var(--muted); }
 
   /* ---------- checklist / first Trail ---------- */
 
@@ -335,26 +335,7 @@
 
   .farewell.in .farewell-sub { opacity: 1; }
 
-  /* three dashes that draw themselves under the farewell — a small "trail" */
-  .trail-marks {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-top: 1.5rem;
-  }
-
-  .trail-marks span {
-    width: 2.5rem;
-    height: 2px;
-    background: var(--ink);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 300ms ease;
-  }
-
-  .farewell.in .trail-marks span:nth-child(1) { transform: scaleX(1); transition-delay: 600ms; }
-  .farewell.in .trail-marks span:nth-child(2) { transform: scaleX(1); transition-delay: 750ms; }
-  .farewell.in .trail-marks span:nth-child(3) { transform: scaleX(1); transition-delay: 900ms; }
+  .farewell-sub { font-size: 1.35rem; }
 
   /* ---------- footer: nav + progress ---------- */
 
@@ -526,10 +507,11 @@
         is what code review looks like in the era of agents.</p>
     </div>
     <div class="gates">
-      <div class="gate"><span class="gate-name">Gate — placeholder</span><span class="gate-sub">What it checks</span></div>
-      <div class="gate"><span class="gate-name">Gate — placeholder</span><span class="gate-sub">What it checks</span></div>
-      <div class="gate"><span class="gate-name">Gate — placeholder</span><span class="gate-sub">What it checks</span></div>
+      <span class="gate">Gate placeholder</span>
+      <span class="gate">Gate placeholder</span>
+      <span class="gate">Gate placeholder</span>
     </div>
+    <div class="video-placeholder">Video placeholder — Gates on Trails</div>
   </section>
 
   <!-- 13 — build your first Trail -->
@@ -605,9 +587,8 @@
     </div>
 
     <div id="farewell" class="farewell" hidden>
-      <p class="farewell-line" data-slot="farewell">Happy trails</p>
-      <p class="meta farewell-sub">Come back any time — bring a colleague.</p>
-      <div class="trail-marks"><span></span><span></span><span></span></div>
+      <p class="farewell-line">Happy trails!</p>
+      <p class="farewell-sub">Go get your swag.</p>
     </div>
   </section>
 
@@ -666,13 +647,10 @@
     var name = nameInput.value.trim();
 
     document.querySelector('[data-slot="greeting"]').textContent =
-      name ? 'Welcome to Entire, ' + name : 'Welcome to Entire';
+      name ? 'Welcome to Entire, ' + name + '!' : 'Welcome to Entire!';
 
     document.querySelector('[data-slot="thanks"]').textContent =
-      name ? 'Thanks, ' + name : 'Thanks for stopping by';
-
-    document.querySelector('[data-slot="farewell"]').textContent =
-      name ? 'Happy trails, ' + name : 'Happy trails';
+      name ? 'Thanks for stopping by, ' + name + '!' : 'Thanks for stopping by!';
   }
 
   // Put the outro back so the next visitor starts from the CTAs, not the farewell.

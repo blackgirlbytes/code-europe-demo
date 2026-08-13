@@ -1,9 +1,13 @@
-# wad-sanj-ose-booth-experience
-Prototype for WeAreDevelopers San Jose booth experience. Aims for self-paced leaning education with the goal for participants to create their first Trail.
+# Booth Experience — WAD San Jose
 
-## Running it
+Self-paced learning experience for the Entire booth at WeAreDevelopers San Jose. Participants walk through Entire's three layers and create their first Trail.
 
-Open `index.html` in a browser — no build step, no server. Navigate with the Back/Next buttons or the left/right arrow keys.
+## Run it
 
-All video content is a placeholder at this stage, and the styling is deliberately unbranded (white background, black text).
+Open `index.html` in any browser — no build step, no server.
 
+```
+open index.html
+```
+
+Navigate with the Back/Next buttons or the left/right arrow keys. Video content and copy are placeholders at this stage.
