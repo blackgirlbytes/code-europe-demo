@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Booth Experience Prototype</title>
+<style>
+  :root {
+    --ink: #000;
+    --paper: #fff;
+    --muted: #666;
+    --rule: #000;
+    --track: #e5e5e5;
+    --wash: #fafafa;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { margin: 0; height: 100%; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 18px;
+    line-height: 1.55;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ---------- layout ---------- */
+
+  main {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1.5rem 2rem;
+    overflow-y: auto;
+  }
+
+  .page {
+    display: none;
+    width: 100%;
+    max-width: 42rem;
+  }
+
+  .page.active { display: block; }
+
+  h1 {
+    font-size: 2.25rem;
+    line-height: 1.15;
+    margin: 0 0 1rem;
+    font-weight: 600;
+  }
+
+  p { margin: 0 0 1rem; }
+
+  .lede { font-size: 1.2rem; }
+
+  .meta { color: var(--muted); font-size: 0.95rem; }
+
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin: 0 0 0.6rem;
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px solid var(--rule);
+    margin: 2rem 0;
+  }
+
+  /* ---------- page 1 ---------- */
+
+  .intro { text-align: center; }
+
+  .intro .topline {
+    display: inline-block;
+    border: 1px solid var(--rule);
+    padding: 0.4rem 0.9rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 2rem;
+  }
+
+  .intro h1 { font-size: 2.6rem; margin-bottom: 3.5rem; }
+
+  .ask {
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin: 0 0 1rem;
+  }
+
+  input[type="text"] {
+    font: inherit;
+    font-size: 1.35rem;
+    color: inherit;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    padding: 0.9rem 1rem;
+    width: 100%;
+    max-width: 24rem;
+    min-height: 56px;
+    text-align: center;
+  }
+
+  /* ---------- 3-layer overview ---------- */
+
+  .tiers {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    margin: 2rem 0 0;
+  }
+
+  .tier {
+    border: 1px solid var(--rule);
+    padding: 1.15rem 1.25rem;
+    background: var(--paper);
+    transition: opacity 450ms ease, transform 450ms ease;
+    transform-origin: center;
+  }
+
+  .tier .name { font-size: 1.3rem; font-weight: 600; }
+
+  .tier .blurb {
+    font-size: 0.95rem;
+    color: var(--muted);
+    margin: 0.25rem 0 0;
+  }
+
+  /* zoom into whichever layer comes next */
+  .tiers.zoom .tier { opacity: 0; transform: scale(0.94); }
+  .tiers.zoom .tier.focus { opacity: 1; transform: scale(1.06); }
+
+  /* ---------- layer + video pages ---------- */
+
+  .layer-title {
+    border: 1px solid var(--rule);
+    padding: 1.4rem 1.5rem;
+    margin: 0 0 1.5rem;
+  }
+
+  .layer-title h1 { margin: 0; }
+
+  .video-placeholder {
+    border: 1px solid var(--rule);
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 1rem;
+    color: var(--muted);
+    font-size: 0.95rem;
+    background: repeating-linear-gradient(45deg, #fff, #fff 12px, var(--wash) 12px, var(--wash) 24px);
+  }
+
+  .placeholder-text {
+    border: 1px dashed var(--rule);
+    padding: 1.1rem 1.25rem;
+    margin: 0 0 1.5rem;
+  }
+
+  .placeholder-text p:last-child { margin: 0; }
+
+  /* ---------- gates ---------- */
+
+  .gates {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin: 0 0 1.5rem;
+  }
+
+  .gate {
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 0.45rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* ---------- checklist / first Trail ---------- */
+
+  .checklist {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    counter-reset: task;
+  }
+
+  .task {
+    border: 1px solid var(--rule);
+    padding: 1rem 1.15rem;
+  }
+
+  .task-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    cursor: pointer;
+    counter-increment: task;
+  }
+
+  .task-line input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
+    margin: 0.15rem 0 0;
+    accent-color: #000;
+    flex: 0 0 auto;
+  }
+
+  .task-text { font-size: 1.1rem; }
+
+  .task-text::before {
+    content: "Step " counter(task) " — ";
+    color: var(--muted);
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .task-line input:checked ~ .task-text .task-body {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+
+  .hint { margin: 0.75rem 0 0 2.4rem; }
+
+  .hint summary {
+    display: inline-block;
+    border: 1px solid var(--rule);
+    padding: 0.4rem 0.9rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .hint summary::-webkit-details-marker { display: none; }
+
+  .hint summary:hover { background: #f2f2f2; }
+
+  .hint[open] summary { margin-bottom: 0.75rem; }
+
+  .hint summary .when-open,
+  .hint[open] summary .when-closed { display: none; }
+
+  .hint[open] summary .when-open { display: inline; }
+
+  .hint-body {
+    border-left: 2px solid var(--rule);
+    padding: 0.1rem 0 0.1rem 0.9rem;
+  }
+
+  .hint-body p { margin: 0 0 0.4rem; }
+
+  .hint-body p:last-child { margin: 0; }
+
+  /* ---------- CTAs ---------- */
+
+  .ctas {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin: 1.5rem 0 0;
+  }
+
+  .cta {
+    border: 1px solid var(--rule);
+    padding: 0.9rem 1rem;
+    min-height: 72px;
+  }
+
+  .cta .cta-title { font-weight: 600; display: block; }
+
+  .cta .cta-sub {
+    font-size: 0.85rem;
+    color: var(--muted);
+    display: block;
+    margin-top: 0.15rem;
+  }
+
+  /* ---------- finish + farewell ---------- */
+
+  .finish-btn {
+    display: block;
+    width: 100%;
+    margin: 2rem 0 0;
+    font-size: 1.35rem;
+    padding: 1.1rem;
+    min-height: 68px;
+    border-width: 2px;
+    letter-spacing: 0.02em;
+  }
+
+  .finish-btn:hover { background: var(--ink); color: var(--paper); }
+
+  #outro {
+    transition: opacity 300ms ease;
+  }
+
+  #outro.leaving { opacity: 0; }
+
+  .farewell { text-align: center; }
+
+  .farewell-line {
+    font-size: 3.2rem;
+    font-weight: 600;
+    line-height: 1.1;
+    margin: 0 0 1rem;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 550ms ease, transform 550ms ease;
+  }
+
+  .farewell-sub {
+    opacity: 0;
+    transition: opacity 450ms ease 350ms;
+  }
+
+  .farewell.in .farewell-line { opacity: 1; transform: scale(1); }
+
+  .farewell.in .farewell-sub { opacity: 1; }
+
+  .farewell-sub { font-size: 1.35rem; }
+
+  /* ---------- footer: nav + progress ---------- */
+
+  footer {
+    flex: 0 0 auto;
+    border-top: 1px solid var(--rule);
+    padding: 1rem 1.5rem 1.25rem;
+  }
+
+  .nav {
+    max-width: 42rem;
+    margin: 0 auto 0.9rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  button {
+    font: inherit;
+    font-weight: 600;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    padding: 0.7rem 1.6rem;
+    min-height: 48px;
+    min-width: 7rem;
+    cursor: pointer;
+  }
+
+  button:hover { background: #f2f2f2; }
+  button:active { background: #e6e6e6; }
+  button[hidden] { display: none; }
+
+  .nav .spacer { flex: 1 1 auto; }
+
+  .progress {
+    max-width: 42rem;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+  }
+
+  .track { flex: 1 1 auto; height: 6px; background: var(--track); }
+
+  .fill {
+    height: 100%;
+    width: 0;
+    background: var(--ink);
+    transition: width 300ms ease;
+  }
+
+  .step-label { font-size: 0.85rem; color: var(--muted); white-space: nowrap; }
+
+  @media (max-width: 600px) {
+    body { font-size: 17px; }
+    h1 { font-size: 1.8rem; }
+    .intro h1 { font-size: 2rem; }
+    main { padding: 2rem 1.1rem 1.5rem; }
+    .ctas { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<main>
+
+  <!-- ==================================================================
+       STEP 1 of 14 — Welcome and name entry
+       ================================================================== -->
+  <section class="page intro" data-step="1">
+    <span class="topline">You drive yourself · Est. 4 minutes</span>
+    <h1>Build your first Trail<br>and win Entire swag</h1>
+    <p class="ask"><label for="name">What's your name?</label></p>
+    <input type="text" id="name" autocomplete="given-name" placeholder="Type your name">
+  </section>
+
+  <!-- ==================================================================
+       STEP 2 of 14 — Welcome by name, and what Entire is
+       ================================================================== -->
+  <section class="page" data-step="2">
+    <h1 data-slot="greeting">Welcome to Entire, <span class="meta">[name]</span></h1>
+    <div class="placeholder-text">
+      <p class="eyebrow">Placeholder — what Entire is</p>
+      <p class="lede">One or two lines explaining what Entire is, in plain language, for someone
+        who has never heard of it.</p>
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       STEP 3 of 14 — The three layers (zooms into the Semantic Layer)
+       ================================================================== -->
+  <section class="page" data-step="3" data-overview data-overview-source>
+    <p class="eyebrow">The approach</p>
+    <h1>Three layers</h1>
+    <p>Entire works across three layers. We'll walk through them one at a time.</p>
+    <div class="tiers">
+      <div class="tier" data-tier="1">
+        <span class="name">Semantic Layer</span>
+        <p class="blurb">Capturing what your codebase and your team actually know.</p>
+      </div>
+      <div class="tier" data-tier="2">
+        <span class="name">Distribution Layer</span>
+        <p class="blurb">Getting that knowledge to every agent and every developer.</p>
+      </div>
+      <div class="tier" data-tier="3">
+        <span class="name">Code Review Layer</span>
+        <p class="blurb">Holding the line on what actually ships.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       STEP 4 of 14 — Semantic Layer
+       ================================================================== -->
+  <section class="page" data-step="4">
+    <div class="layer-title">
+      <p class="eyebrow">Layer 1 of 3</p>
+      <h1>Semantic Layer</h1>
+    </div>
+    <div class="placeholder-text">
+      <p class="eyebrow">Placeholder — what this layer does</p>
+      <p>Where knowledge gets captured: the decisions, conventions and context that usually live
+        in someone's head.</p>
+    </div>
+  </section>
+
+  <!-- ==================================================================
+       STEP 5 of 14 — Semantic Layer: Checkpoints
+       ================================================================== -->
+  <section class="page" data-step="5">
+    <h1>Checkpoints</h1>
+    <div class="video-placeholder">Video placeholder — Checkpoints</div>
+  </section>
+
+  <!-- ==================================================================
+       STEP 6 of 14 — Semantic Layer: using the CLI
+       ================================================================== -->
+  <section class="page" data-step="6">
+    <h1>You, or your agent, using the CLI</h1>
+    <div class="video-placeholder">Video placeholder — You or your agent using the CLI</div>
+  </section>
+
+  <!-- ==================================================================
+       STEP 7 of 14 — The three layers (zooms into the Distribution Layer)
+       ================================================================== -->
+  <!-- Filled from STEP 3 when the page loads, so the three layers only
+       ever need editing in one place. Edit STEP 3 to change all three. -->
+  <section class="page" data-step="7" data-overview data-overview-clone></section>
+
+  <!-- ==================================================================
+       STEP 8 of 14 — Distribution Layer
+       ================================================================== -->
+  <section class="page" data-step="8">
+    <div class="layer-title">
+      <p class="eyebrow">Layer 2 of 3</p>
+      <h1>Distribution Layer</h1>
+    </div>
+    <div class="placeholder-text">
+      <p>Get your repository mirrored near you, in a jurisdiction of your choice, so you're faster.</p>
+    </div>
+    <div class="video-placeholder">Video placeholder — Mirroring &amp; jurisdiction</div>
+  </section>
+
+  <!-- ==================================================================
+       STEP 9 of 14 — Distribution Layer: speed comparison
+       ================================================================== -->
+  <section class="page" data-step="9">
+    <h1>Speed comparison</h1>
+    <div class="video-placeholder">Video placeholder — Speed comparison</div>
+  </section>
+
+  <!-- ==================================================================
+       STEP 10 of 14 — The three layers (zooms into the Code Review Layer)
+       ================================================================== -->
+  <!-- Filled from STEP 3 when the page loads, so the three layers only
+       ever need editing in one place. Edit STEP 3 to change all three. -->
+  <section class="page" data-step="10" data-overview data-overview-clone></section>
+
+  <!-- ==================================================================
+       STEP 11 of 14 — Code Review Layer
+       ================================================================== -->
+  <section class="page" data-step="11">
+    <div class="layer-title">
+      <p class="eyebrow">Layer 3 of 3</p>
+      <h1>Code Review Layer</h1>
+    </div>
+    <div class="placeholder-text">
+      <p class="eyebrow">Placeholder — copy goes here</p>
+      <p>The road towards your first Trail, and the next level of code review in the era of agents.</p>
+    </div>
+    <div class="video-placeholder">Video placeholder — Code Review Layer</div>
+  </section>
+
+  <!-- ==================================================================
+       STEP 12 of 14 — Gates on Trails
+       ================================================================== -->
+  <section class="page" data-step="12">
+    <h1>Gates on Trails</h1>
+    <div class="placeholder-text">
+      <p class="eyebrow">Placeholder — copy goes here</p>
+      <p>A deeper look at gates: what a Trail checks before code is allowed through, and why that
+        is what code review looks like in the era of agents.</p>
+    </div>
+    <div class="gates">
+      <span class="gate">Gate placeholder</span>
+      <span class="gate">Gate placeholder</span>
+      <span class="gate">Gate placeholder</span>
+    </div>
+    <div class="video-placeholder">Video placeholder — Gates on Trails</div>
+  </section>
+
+  <!-- ==================================================================
+       STEP 13 of 14 — Build your first Trail: the checklist
+       ================================================================== -->
+  <section class="page" data-step="13">
+    <h1>Build your first Trail</h1>
+    <p class="meta">Three steps, using what you just learned. Tick them off as you go.</p>
+
+    <ol class="checklist">
+      <li class="task">
+        <label class="task-line">
+          <input type="checkbox">
+          <span class="task-text"><span class="task-body">Ask a question about a previous session.</span></span>
+        </label>
+        <details class="hint">
+          <summary><span class="when-closed">Get a hint</span><span class="when-open">Hide hint</span></summary>
+          <div class="hint-body">
+            <p>Placeholder — the hint for this step.</p>
+            <p class="meta">Need more help? Ask at the Entire booth.</p>
+          </div>
+        </details>
+      </li>
+
+      <li class="task">
+        <label class="task-line">
+          <input type="checkbox">
+          <span class="task-text"><span class="task-body">Resume that session.</span></span>
+        </label>
+        <details class="hint">
+          <summary><span class="when-closed">Get a hint</span><span class="when-open">Hide hint</span></summary>
+          <div class="hint-body">
+            <p>Placeholder — the hint for this step.</p>
+            <p class="meta">Need more help? Ask at the Entire booth.</p>
+          </div>
+        </details>
+      </li>
+
+      <li class="task">
+        <label class="task-line">
+          <input type="checkbox">
+          <span class="task-text"><span class="task-body">Open your first Trail.</span></span>
+        </label>
+        <details class="hint">
+          <summary><span class="when-closed">Get a hint</span><span class="when-open">Hide hint</span></summary>
+          <div class="hint-body">
+            <p>Placeholder — the hint for this step.</p>
+            <p class="meta">Need more help? Ask at the Entire booth.</p>
+          </div>
+        </details>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ==================================================================
+       STEP 14 of 14 — Thanks, CTAs and Finish
+       ================================================================== -->
+  <section class="page" data-step="14">
+    <div id="outro">
+      <h1 data-slot="thanks">Thanks for stopping by</h1>
+      <p class="meta">Three quick things before you go.</p>
+      <div class="ctas">
+        <div class="cta">
+          <span class="cta-title">Take a selfie — and tag us</span>
+          <span class="cta-sub">Placeholder — frame at the booth + handle to tag</span>
+        </div>
+        <div class="cta">
+          <span class="cta-title">Subscribe to our newsletter</span>
+          <span class="cta-sub">Placeholder — QR code</span>
+        </div>
+        <div class="cta">
+          <span class="cta-title">Join our Discord</span>
+          <span class="cta-sub">Placeholder — invite QR</span>
+        </div>
+      </div>
+      <button type="button" id="finish" class="finish-btn">Finish</button>
+    </div>
+
+    <div id="farewell" class="farewell" hidden>
+      <p class="farewell-line">Happy trails!</p>
+      <p class="farewell-sub">Go get your swag.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="nav">
+    <button type="button" data-nav="back">Back</button>
+    <span class="spacer"></span>
+    <button type="button" data-nav="next">Next</button>
+  </div>
+  <div class="progress">
+    <div class="track"><div class="fill" id="fill"></div></div>
+    <span class="step-label" id="step-label">Step 1 of 13</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var TOTAL = 14;
+
+  // Which layer the overview zooms into, per overview step.
+  var ZOOM_TARGET = { 3: '1', 7: '2', 10: '3' };
+
+  var step = 1;
+  var animating = false;
+
+  var pages = document.querySelectorAll('.page');
+  var backBtn = document.querySelector('[data-nav="back"]');
+  var nextBtn = document.querySelector('[data-nav="next"]');
+  var fill = document.getElementById('fill');
+  var stepLabel = document.getElementById('step-label');
+  var nameInput = document.getElementById('name');
+  var finishBtn = document.getElementById('finish');
+  var outro = document.getElementById('outro');
+  var farewell = document.getElementById('farewell');
+
+  function activePage() {
+    return document.querySelector('.page.active');
+  }
+
+  // STEPS 7 and 10 show the same three layers as STEP 3 — copy it in rather than
+  // repeating the markup, so the wording can never drift between them.
+  (function cloneOverviews() {
+    var source = document.querySelector('[data-overview-source]');
+    var clones = document.querySelectorAll('[data-overview-clone]');
+    for (var i = 0; i < clones.length; i++) clones[i].innerHTML = source.innerHTML;
+  })();
+
+  function clearZoom() {
+    var tiers = document.querySelectorAll('.tiers');
+    for (var i = 0; i < tiers.length; i++) {
+      tiers[i].classList.remove('zoom');
+      var focused = tiers[i].querySelectorAll('.tier.focus');
+      for (var j = 0; j < focused.length; j++) focused[j].classList.remove('focus');
+    }
+  }
+
+  function fillSlots() {
+    var name = nameInput.value.trim();
+
+    document.querySelector('[data-slot="greeting"]').textContent =
+      name ? 'Welcome to Entire, ' + name + '!' : 'Welcome to Entire!';
+
+    document.querySelector('[data-slot="thanks"]').textContent =
+      name ? 'Thanks for stopping by, ' + name + '!' : 'Thanks for stopping by!';
+  }
+
+  // Put the outro back so the next visitor starts from the CTAs, not the farewell.
+  function resetOutro() {
+    outro.hidden = false;
+    outro.classList.remove('leaving');
+    farewell.hidden = true;
+    farewell.classList.remove('in');
+  }
+
+  function render() {
+    clearZoom();
+    resetOutro();
+
+    for (var i = 0; i < pages.length; i++) {
+      pages[i].classList.toggle('active', Number(pages[i].getAttribute('data-step')) === step);
+    }
+
+    backBtn.hidden = (step === 1);
+    nextBtn.hidden = (step === TOTAL);
+
+    fill.style.width = ((step - 1) / (TOTAL - 1) * 100) + '%';
+    stepLabel.textContent = 'Step ' + step + ' of ' + TOTAL;
+
+    fillSlots();
+    document.querySelector('main').scrollTop = 0;
+  }
+
+  function goTo(target) {
+    if (target < 1 || target > TOTAL) return;
+    step = target;
+    render();
+  }
+
+  function next() {
+    if (animating) return;
+
+    // Leaving an overview page: zoom into the layer we're about to open.
+    var page = activePage();
+    if (page && page.hasAttribute('data-overview') && ZOOM_TARGET[step]) {
+      var tiers = page.querySelector('.tiers');
+      var target = tiers.querySelector('[data-tier="' + ZOOM_TARGET[step] + '"]');
+      var to = step + 1;
+
+      animating = true;
+      target.classList.add('focus');
+      tiers.classList.add('zoom');
+
+      var done = false;
+      var finish = function () {
+        if (done) return;
+        done = true;
+        animating = false;
+        goTo(to);
+      };
+
+      tiers.addEventListener('transitionend', finish, { once: true });
+      setTimeout(finish, 600); // fallback so a fast tapper never gets stuck
+      return;
+    }
+
+    goTo(step + 1);
+  }
+
+  function back() {
+    if (animating) return;
+    goTo(step - 1);
+  }
+
+  finishBtn.addEventListener('click', function () {
+    outro.classList.add('leaving');
+    setTimeout(function () {
+      outro.hidden = true;
+      farewell.hidden = false;
+      // let the browser paint the hidden->shown swap before transitioning in
+      requestAnimationFrame(function () { farewell.classList.add('in'); });
+    }, 300);
+  });
+
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-nav]');
+    if (!el) return;
+    if (el.getAttribute('data-nav') === 'next') next();
+    else back();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    // A focused nav button already turns Enter/Space into a click — don't double-advance.
+    if (e.target.closest && e.target.closest('[data-nav]')) return;
+    if (e.target === nameInput && e.key !== 'Enter') return;
+    if (e.key === 'ArrowRight' || e.key === 'Enter') next();
+    if (e.key === 'ArrowLeft') back();
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>
