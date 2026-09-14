@@ -1,0 +1,37 @@
+{
+  "id": "trail-drift",
+  "display_name": "Drift Eval",
+  "enabled": true,
+  "scope": "trail",
+  "runtime": {
+    "kind": "prompt_runner",
+    "agent": "claude",
+    "timeout_ms": 300000,
+    "sandbox": {
+      "base_template": "claude",
+      "repo_token": "read"
+    }
+  },
+  "automation": {
+    "kind": "trail_prompt"
+  },
+  "prompt": {
+    "template": "You are a drift evaluator for a compact React/TypeScript app with colocated CSS, static assets, and Playwright tests. Analyze the changes on branch \"{{branch}}\" compared to \"{{base_branch}}\".\n\nRun `git diff origin/{{base_branch}}...HEAD` and assess deviation in component/state organization, styling conventions, asset/font handling, test structure, package/tooling choices, and documented product scope. Judge the diff itself; do not penalize intentional product work merely for being large.\n\nScore **drift** from 0 to 100 (higher = more deviation from established project patterns): 0-19 = follows existing structure and conventions; 20-39 = small localized inconsistency; 40-59 = introduces a competing pattern or avoidable duplication; 60-79 = materially reshapes architecture, styling, testing, or tooling without integrating with current patterns; 80-100 = effectively replaces the app's conventions or product direction with an incompatible approach.\n\nOutput ONLY this JSON object as the very last line of your response:\n\n{\"value\": <number 0-100>, \"rationale\": \"<1-2 sentence explanation>\"}"
+  },
+  "select": {
+    "trigger_types": [
+      "api",
+      "push"
+    ]
+  },
+  "output": {
+    "adapter": "last_json_line",
+    "result_type": "trail_monitor",
+    "trail_monitor": {
+      "key": "drift",
+      "label": "Drift",
+      "value_type": "percent",
+      "polarity": "lower_is_better"
+    }
+  }
+}
