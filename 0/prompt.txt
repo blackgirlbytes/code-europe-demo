@@ -1,0 +1,1 @@
+also in an [**agents.md**](http://agents.md/) write a rule that says every time we make a change to a file, make a commit
