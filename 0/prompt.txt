@@ -1,0 +1,9 @@
+also in an [**agents.md**](http://agents.md/) write a rule that says every time we make a change to a file, make a commit
+
+---
+
+lets create the initial product experience
+
+---
+
+i dont want this to be a chatgpt site. just make it a regular web app
