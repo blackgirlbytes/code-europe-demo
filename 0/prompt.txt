@@ -1,0 +1,9 @@
+I'm not entirely sure about the app i want to build..but i want to build a music app that enables me to play instruments even though idk how\..this should use computer vision and it should be able to work with real instruments or just like "air" instruments as in there's no instrument there..but i am moving fingers and sounds are being made..and it should like im making real music. idk if this should be sonic pi..but i know i should use media pipe for it. lets start working on a plan together
+
+---
+
+can it still show keys and chords etc..like still be a learning tool in some way
+
+---
+
+ok lets put this plan into a markdown file
