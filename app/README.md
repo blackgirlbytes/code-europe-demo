@@ -26,4 +26,5 @@ Open the local URL printed by Vite. Camera access works on `localhost` or a secu
 ```bash
 npm run lint
 npm run build
+npm run test:e2e
 ```
