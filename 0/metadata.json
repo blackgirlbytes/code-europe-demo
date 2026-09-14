@@ -1,0 +1,71 @@
+{
+  "cli_version": "0.10.6",
+  "checkpoint_id": "01M2FX2ZDRWT2D7TJB9EAX7FAN",
+  "session_id": "01a09fcd-9b2b-79a0-94b5-35b53b7badb8",
+  "strategy": "manual-commit",
+  "created_at": "2026-09-14T12:08:21.98756Z",
+  "branch": "create-a-test-for-the-actual-gesture-to-music-pi",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "app/tests/airjam.spec.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-5.6-sol",
+  "turn_id": "c38e8703e750",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 64845,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1129984,
+    "output_tokens": 10506,
+    "api_call_count": 29
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-09-14T12:08:21.972555Z",
+    "agent_lines": 176,
+    "agent_removed": 60,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 176,
+    "total_lines_changed": 236,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 3840,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".agents/skills/address-findings/SKILL.md": 155,
+        ".agents/skills/explain/SKILL.md": 34,
+        ".agents/skills/recall/SKILL.md": 128,
+        ".agents/skills/replay/SKILL.md": 141,
+        ".agents/skills/review/SKILL.md": 220,
+        ".agents/skills/review/references/review-rules.md": 87,
+        ".agents/skills/session-crosslink/SKILL.md": 141,
+        ".agents/skills/session-handoff/SKILL.md": 137,
+        ".agents/skills/session-to-skill/SKILL.md": 210,
+        ".agents/skills/teach/SKILL.md": 130,
+        ".agents/skills/using-entire/SKILL.md": 165,
+        ".agents/skills/what-happened/SKILL.md": 333,
+        "agent/skills/address-findings/SKILL.md": 153,
+        "agent/skills/explain/SKILL.md": 34,
+        "agent/skills/recall/SKILL.md": 131,
+        "agent/skills/replay/SKILL.md": 144,
+        "agent/skills/review/SKILL.md": 219,
+        "agent/skills/review/references/review-rules.md": 87,
+        "agent/skills/session-crosslink/SKILL.md": 143,
+        "agent/skills/session-handoff/SKILL.md": 138,
+        "agent/skills/session-to-skill/SKILL.md": 211,
+        "agent/skills/teach/SKILL.md": 133,
+        "agent/skills/using-entire/SKILL.md": 163,
+        "agent/skills/what-happened/SKILL.md": 332,
+        "skills-lock.json": 71
+      }
+    }
+  ]
+}
