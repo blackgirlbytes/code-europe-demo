@@ -25,6 +25,21 @@
   "session_metrics": {
     "turn_count": 2
   },
+  "summary": {
+    "intent": "Add a repository-wide instruction to AGENTS.md requiring a commit whenever a file is changed.",
+    "outcome": "The rule was added to AGENTS.md and committed successfully in commit a4dd4ba with message \"Add commit-after-change repository rule\".",
+    "learnings": {
+      "repo": [
+        "Repository policy requires every file change to be committed."
+      ],
+      "code": [],
+      "workflow": [
+        "Verify repository state and avoid including unrelated user changes before committing."
+      ]
+    },
+    "friction": [],
+    "open_items": []
+  },
   "initial_attribution": {
     "calculated_at": "2026-09-14T09:12:35.040926Z",
     "agent_lines": 6,
