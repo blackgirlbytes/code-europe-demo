@@ -1,4 +1,153 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
+
+type HandPosition = { indexX: number; indexY: number; pinchDistance: number }
+type Landmark = { x: number; y: number; z: number }
+type ToneCall = { pitch: string; duration: string; time?: number; velocity: number }
+
+declare global {
+  interface Window {
+    __airJamLandmarks: Landmark[]
+    __runAirJamFrame: () => void
+    __toneCalls: ToneCall[]
+  }
+}
+
+const mediaPipeMock = `
+  export class DrawingUtils {
+    drawConnectors() {}
+    drawLandmarks() {}
+  }
+
+  export const FilesetResolver = {
+    forVisionTasks: async () => ({}),
+  }
+
+  export class HandLandmarker {
+    static HAND_CONNECTIONS = []
+
+    static async createFromOptions() {
+      return {
+        close() {},
+        detectForVideo() {
+          const landmarks = globalThis.__airJamLandmarks
+          return { landmarks: landmarks ? [landmarks] : [] }
+        },
+      }
+    }
+  }
+`
+
+const toneMock = `
+  const calls = globalThis.__toneCalls = []
+
+  export const start = async () => {}
+  export class Synth {}
+  export class MonoSynth {}
+
+  export class PolySynth {
+    connect() { return this }
+    toDestination() { return this }
+    dispose() {}
+    triggerAttackRelease(pitch, duration, time, velocity) {
+      calls.push({ pitch, duration, time, velocity })
+    }
+  }
+
+  export class Reverb {
+    toDestination() { return this }
+    dispose() {}
+  }
+
+  export class Recorder {
+    async start() {}
+    async stop() { return new Blob() }
+    dispose() {}
+  }
+
+  export class Loop {
+    start() { return this }
+    stop() { return this }
+    dispose() {}
+  }
+
+  export const getTransport = () => ({
+    bpm: { value: 0 },
+    start() {},
+  })
+`
+
+async function installGestureHarness(page: Page) {
+  await page.route('**/*mediapipe_tasks-vision*.js*', (route) => route.fulfill({
+    contentType: 'application/javascript',
+    body: mediaPipeMock,
+  }))
+  await page.route('**/tone.js*', (route) => route.fulfill({
+    contentType: 'application/javascript',
+    body: toneMock,
+  }))
+  await page.addInitScript(() => {
+    const animationFrames = new Map<number, FrameRequestCallback>()
+    const videoTimes = new WeakMap<HTMLMediaElement, number>()
+    let nextAnimationFrame = 1
+
+    Object.defineProperty(navigator, 'mediaDevices', {
+      configurable: true,
+      value: { getUserMedia: async () => new MediaStream() },
+    })
+    Object.defineProperty(HTMLMediaElement.prototype, 'currentTime', {
+      configurable: true,
+      get() { return videoTimes.get(this) ?? 0 },
+      set(value: number) { videoTimes.set(this, value) },
+    })
+    Object.defineProperty(HTMLMediaElement.prototype, 'readyState', {
+      configurable: true,
+      get: () => 4,
+    })
+    Object.defineProperty(HTMLVideoElement.prototype, 'videoWidth', {
+      configurable: true,
+      get: () => 1280,
+    })
+    Object.defineProperty(HTMLVideoElement.prototype, 'videoHeight', {
+      configurable: true,
+      get: () => 720,
+    })
+    HTMLMediaElement.prototype.play = async function () {
+      videoTimes.set(this, 1)
+    }
+    window.requestAnimationFrame = (callback) => {
+      const id = nextAnimationFrame++
+      animationFrames.set(id, callback)
+      return id
+    }
+    window.cancelAnimationFrame = (id) => animationFrames.delete(id)
+
+    const openHand = Array.from({ length: 9 }, () => ({ x: 0, y: 0, z: 0 }))
+    openHand[4] = { x: 0.7, y: 0.8, z: 0 }
+    openHand[8] = { x: 0.9, y: 0.8, z: 0 }
+    window.__airJamLandmarks = openHand
+
+    window.__runAirJamFrame = () => {
+      const nextFrame = animationFrames.entries().next().value
+      if (!nextFrame) throw new Error('AirJam did not request another animation frame')
+      const [id, callback] = nextFrame
+      animationFrames.delete(id)
+      const video = document.querySelector('video')
+      if (!video) throw new Error('AirJam video element was not found')
+      videoTimes.set(video, (videoTimes.get(video) ?? 0) + 1)
+      callback(performance.now())
+    }
+  })
+}
+
+async function presentHand(page: Page, hand: HandPosition) {
+  await page.evaluate(({ indexX, indexY, pinchDistance }) => {
+    const landmarks = Array.from({ length: 9 }, () => ({ x: 0, y: 0, z: 0 }))
+    landmarks[4] = { x: indexX - pinchDistance, y: indexY, z: 0 }
+    landmarks[8] = { x: indexX, y: indexY, z: 0 }
+    window.__airJamLandmarks = landmarks
+    window.__runAirJamFrame()
+  }, hand)
+}
 
 test.describe('AirJam beginner experience', () => {
   test('loads the playable instrument and learning guide', async ({ page }) => {
@@ -91,5 +240,31 @@ test.describe('AirJam beginner experience', () => {
     await expect(page.getByText('Camera is unavailable in this browser')).toBeVisible()
     await page.getByRole('button', { name: 'Play E', exact: true }).click()
     await expect(page.getByRole('status')).toContainText('E played')
+  })
+
+  test('maps tracked pinches to pitch and velocity without retriggering a held gesture', async ({ page }) => {
+    await installGestureHarness(page)
+    await page.goto('/')
+
+    await page.getByRole('button', { name: 'Use camera' }).click()
+    await expect(page.getByText('Hand found · pinch to pluck')).toBeVisible()
+
+    await presentHand(page, { indexX: 0.9, indexY: 0.8, pinchDistance: 0.04 })
+    await expect.poll(() => page.evaluate(() => window.__toneCalls.length)).toBe(1)
+    await expect(page.getByRole('status')).toContainText('C played')
+
+    await presentHand(page, { indexX: 0.9, indexY: 0.8, pinchDistance: 0.04 })
+    await page.waitForTimeout(50)
+    expect(await page.evaluate(() => window.__toneCalls.length)).toBe(1)
+
+    await presentHand(page, { indexX: 0.9, indexY: 0.8, pinchDistance: 0.1 })
+    await presentHand(page, { indexX: 0.1, indexY: 0.2, pinchDistance: 0.04 })
+    await expect.poll(() => page.evaluate(() => window.__toneCalls.length)).toBe(2)
+    await expect(page.getByRole('status')).toContainText('A played')
+
+    const calls = await page.evaluate(() => window.__toneCalls)
+    expect(calls.map(({ pitch }) => pitch)).toEqual(['C4', 'A4'])
+    expect(calls[0].velocity).toBeCloseTo(0.64, 5)
+    expect(calls[1].velocity).toBeCloseTo(0.91, 5)
   })
 })
