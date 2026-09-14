@@ -31,6 +31,37 @@
   "session_metrics": {
     "turn_count": 2
   },
+  "summary": {
+    "intent": "Define a plan for a computer-vision music app that lets beginners play real or air instruments while learning notes, keys, chords, rhythm, and music theory, then save that plan in the repository.",
+    "outcome": "A PRODUCT_PLAN.md file was created containing the product vision, Air Harp MVP, learning modes, gesture vocabulary, interface concept, architecture, phased roadmap, risks, success criteria, and Sonic Pi strategy. The proposed initial stack uses React, TypeScript, MediaPipe Tasks Vision, Tone.js/Web Audio, and a canvas overlay.",
+    "learnings": {
+      "repo": [
+        "The project plan was saved as PRODUCT_PLAN.md.",
+        "The workspace also contains README.md, index.html, and an assets directory, but the transcript does not establish their architecture or conventions."
+      ],
+      "code": [],
+      "workflow": [
+        "Start with a small Air Harp proof of concept to validate whether gesture-based playing feels responsive and enjoyable.",
+        "Represent detected gestures as semantic events such as noteStart, noteEnd, strum, and expression so vision and audio implementations remain decoupled.",
+        "Use a pentatonic scale, gesture smoothing, hysteresis, debounce logic, and calibration to reduce accidental notes while preserving responsiveness.",
+        "Treat educational feedback as part of the core experience by synchronizing note names, illuminated piano keys, chord details, scale guidance, and rhythm history.",
+        "Prefer browser audio for the MVP; defer Sonic Pi to an optional OSC-based advanced integration."
+      ]
+    },
+    "friction": [
+      "The initial product concept was broad and uncertain, requiring the MVP instrument, interaction model, and technology boundaries to be narrowed.",
+      "Accidental note triggering and responsiveness were identified as the main technical risks, though no implementation blockers were encountered."
+    ],
+    "open_items": [
+      "Build and validate the Air Harp MVP with webcam input, hand landmarks, pinch detection, scale mapping, synth output, calibration, and note history.",
+      "Finalize gesture mappings and the balance between Safe Notes and fully chromatic True Notes.",
+      "Design and implement Free Play, Guided Jam, Learn a Song, and Music Explorer modes.",
+      "Add beat quantization, chords, accompaniment, looping, overdubbing, and recording/export after validating the core interaction.",
+      "Explore air piano, guitar, and drum modes after the Air Harp experience is proven.",
+      "Defer real-instrument calibration, microphone confirmation, and Sonic Pi OSC integration to later phases.",
+      "Determine whether backend or server features will eventually require moving beyond a Vite-only application."
+    ]
+  },
   "initial_attribution": {
     "calculated_at": "2026-09-14T09:04:52.623707Z",
     "agent_lines": 0,
