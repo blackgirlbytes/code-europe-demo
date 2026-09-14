@@ -1,0 +1,71 @@
+{
+  "cli_version": "0.10.6",
+  "checkpoint_id": "01M2FRVK3PA0K88NKWGX5AWGAC",
+  "session_id": "01a09f8b-d8ea-7fc0-a604-2bdc2cf992b8",
+  "strategy": "manual-commit",
+  "created_at": "2026-09-14T10:54:27.037357Z",
+  "branch": "add-test-coverage-for-recording-and-download",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "app/tests/airjam.spec.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-5.6-sol",
+  "turn_id": "92e2a4aa91df",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 55013,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1029504,
+    "output_tokens": 5624,
+    "api_call_count": 23
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-09-14T10:54:26.956458Z",
+    "agent_lines": 59,
+    "agent_removed": 0,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 59,
+    "total_lines_changed": 59,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 3840,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".agents/skills/address-findings/SKILL.md": 155,
+        ".agents/skills/explain/SKILL.md": 34,
+        ".agents/skills/recall/SKILL.md": 128,
+        ".agents/skills/replay/SKILL.md": 141,
+        ".agents/skills/review/SKILL.md": 220,
+        ".agents/skills/review/references/review-rules.md": 87,
+        ".agents/skills/session-crosslink/SKILL.md": 141,
+        ".agents/skills/session-handoff/SKILL.md": 137,
+        ".agents/skills/session-to-skill/SKILL.md": 210,
+        ".agents/skills/teach/SKILL.md": 130,
+        ".agents/skills/using-entire/SKILL.md": 165,
+        ".agents/skills/what-happened/SKILL.md": 333,
+        "agent/skills/address-findings/SKILL.md": 153,
+        "agent/skills/explain/SKILL.md": 34,
+        "agent/skills/recall/SKILL.md": 131,
+        "agent/skills/replay/SKILL.md": 144,
+        "agent/skills/review/SKILL.md": 219,
+        "agent/skills/review/references/review-rules.md": 87,
+        "agent/skills/session-crosslink/SKILL.md": 143,
+        "agent/skills/session-handoff/SKILL.md": 138,
+        "agent/skills/session-to-skill/SKILL.md": 211,
+        "agent/skills/teach/SKILL.md": 133,
+        "agent/skills/using-entire/SKILL.md": 163,
+        "agent/skills/what-happened/SKILL.md": 332,
+        "skills-lock.json": 71
+      }
+    }
+  ]
+}
