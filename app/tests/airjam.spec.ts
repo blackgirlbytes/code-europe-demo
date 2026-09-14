@@ -80,6 +80,65 @@ test.describe('AirJam beginner experience', () => {
     await expect(page.getByRole('status')).toContainText('instrument is solo')
   })
 
+  test('records played notes, downloads the take, and can record again', async ({ page }) => {
+    await page.addInitScript(() => {
+      class TestMediaRecorder extends EventTarget {
+        mimeType: string
+        state: RecordingState = 'inactive'
+
+        constructor(_stream: MediaStream, options: MediaRecorderOptions = {}) {
+          super()
+          this.mimeType = options.mimeType || 'audio/webm'
+        }
+
+        start() {
+          this.state = 'recording'
+          queueMicrotask(() => this.dispatchEvent(new Event('start')))
+        }
+
+        resume() {
+          this.start()
+        }
+
+        stop() {
+          this.state = 'inactive'
+          const event = new Event('dataavailable') as Event & { data: Blob }
+          event.data = new Blob(['recorded audio'], { type: this.mimeType })
+          queueMicrotask(() => this.dispatchEvent(event))
+        }
+
+        pause() {
+          this.state = 'paused'
+        }
+      }
+
+      Object.defineProperty(window, 'MediaRecorder', { configurable: true, value: TestMediaRecorder })
+    })
+    await page.goto('/')
+
+    const recordButton = page.locator('.record-button')
+    await expect(recordButton).toHaveAccessibleName('Record')
+    await recordButton.click()
+    await expect(recordButton).toHaveText('Stop & save')
+    await expect(page.getByRole('status')).toContainText('Recording your melody')
+
+    await page.getByRole('button', { name: 'Play G', exact: true }).click()
+    await expect(page.getByRole('status')).toContainText('G played')
+
+    const downloadPromise = page.waitForEvent('download')
+    await recordButton.click()
+    const download = await downloadPromise
+
+    expect(download.suggestedFilename()).toMatch(/^airjam-take-\d{4}-\d{2}-\d{2}\.webm$/)
+    await expect(page.getByRole('status')).toContainText('Take saved to your downloads')
+
+    const recordAgainButton = page.getByRole('button', { name: 'Record again' })
+    await expect(recordAgainButton).toBeVisible()
+    await recordAgainButton.click()
+    await expect(recordButton).toHaveText('Stop & save')
+    await expect(page.getByRole('status')).toContainText('Recording your melody')
+  })
+
   test('keeps demo mode available when camera APIs are unavailable', async ({ page }) => {
     await page.addInitScript(() => {
       Object.defineProperty(navigator, 'mediaDevices', { configurable: true, value: undefined })
